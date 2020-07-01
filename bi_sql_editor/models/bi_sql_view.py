@@ -120,6 +120,15 @@ class BiSQLView(models.Model):
             'sql_valid': [('readonly', False)],
         })
 
+    action_context = fields.Text(
+        string="Action Context", default="{}", readonly=True,
+        help="Define here a context that will be used"
+        " by default, when creating the action.",
+        states={
+            'draft': [('readonly', False)],
+            'sql_valid': [('readonly', False)],
+        })
+
     has_group_changed = fields.Boolean(copy=False)
 
     bi_sql_view_field_ids = fields.One2many(
@@ -255,6 +264,7 @@ class BiSQLView(models.Model):
                 sql_view.cron_id = self.env['ir.cron'].create(
                     sql_view._prepare_cron()).id
             sql_view.state = 'model_valid'
+        return True
 
     @api.multi
     def button_set_draft(self):
@@ -293,6 +303,7 @@ class BiSQLView(models.Model):
         self.menu_id = self.env['ir.ui.menu'].create(
             self._prepare_menu()).id
         self.write({'state': 'ui_valid'})
+        return True
 
     @api.multi
     def button_update_model_access(self):
@@ -451,6 +462,7 @@ class BiSQLView(models.Model):
             'view_mode': view_mode,
             'view_id': view_id,
             'search_view_id': self.search_view_id.id,
+            'context': self.action_context,
         }
 
     @api.multi
